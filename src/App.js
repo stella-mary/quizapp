@@ -1,24 +1,72 @@
-import logo from './logo.svg';
-import './App.css';
+import React, {useState} from 'react'
+import QuestionsList from './components/QuestionsList';
+import {v4 as uuidv4} from 'uuid';
+import './App.css'
 
-function App() {
+const App = () => {
+
+  const [currentQuestion, setCurrentQuestion] = useState(0);
+  const [score, setScore] = useState(0);
+  const [clicked, setClicked] = useState(false);
+  const [showScore, setShowScore] = useState(false);
+
+
+  const handleCorrectAnswer = (isCorrect) => {
+    if(isCorrect) {
+    setScore(score + 1);
+  }
+  setClicked(true);
+};
+
+
+const handleNextQuestion = () => {
+  setClicked(false)
+  if(currentQuestion < QuestionsList.length - 1) {
+    setCurrentQuestion(currentQuestion + 1)
+  } else {
+    setShowScore(true);
+  }
+}
+
+
+  
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+  <div className='app-wrapper'>
+    {showScore ? (
+      <div>
+        <div className='completed'>Completed!</div>
+        <div className='score-section'>
+          Your Score: {score}/{QuestionsList.length}
+        </div>
+      </div>
+    )  : (
+  <div>
+    <div className='question-section-wrapper'>
+      <div className='question-count'>
+        Question {currentQuestion + 1} of {QuestionsList.length}
+      </div>
+      <div className='question'>
+        {QuestionsList[currentQuestion].question}
+      </div>
     </div>
+    <div className='answer-section-wrapper'>
+      {QuestionsList[currentQuestion].answersList.map((answerOptions) => (
+        <li className='answer-list' key={uuidv4()}>
+          <button disabled={clicked}
+          className={`answer-button ${clicked && answerOptions.isCorrect ? 'correct' : ''}`}
+          onClick={() => handleCorrectAnswer(answerOptions.isCorrect)}>
+            {answerOptions.answer} 
+          </button>
+        </li>
+      ))}
+    </div>
+  
+  <div>
+    <button className='next-button' onClick={handleNextQuestion} disabled={!clicked}>Next</button>
+  </div>
+  </div>
+    )}
+  </div>
   );
 }
 
